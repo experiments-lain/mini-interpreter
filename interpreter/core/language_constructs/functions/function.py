@@ -97,7 +97,7 @@ class FunctionFactory:
 class PrimaryFunctionsImplementation:
 
     def puts(output: String, program_state : ProgramState) -> Null:
-        program_state.logger_print(output.getValue())
+        program_state.loggerPrint(output.getValue())
         return ValueFactory.createNull()
     
     def set(variable_name: VariableName, variable_value: Value, program_state : ProgramState) -> Null:

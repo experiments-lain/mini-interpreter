@@ -41,6 +41,7 @@ mini-interpreter
 ## TODO Tasks
 
 - [ ] Write technical blog post about implementation details and design decisions
+- [ ] Integrate error processing component
 - [ ] Implement automatic test generation and evaluation scripts
 - [ ] Implement debug mode/debugger
 - [ ] Migrate code to C++ for improved performance

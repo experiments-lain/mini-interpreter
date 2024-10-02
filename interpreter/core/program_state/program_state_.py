@@ -13,7 +13,7 @@ class ProgramState:
         self.symbol_table = SymbolTable()
         
         
-    def logger_print(self, output):
+    def loggerPrint(self, output):
         self.logger.print(output)
 
     def addVar(self, var_name: VariableName, var_value: Value):
