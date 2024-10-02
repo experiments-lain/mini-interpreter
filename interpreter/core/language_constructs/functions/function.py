@@ -96,66 +96,65 @@ class FunctionFactory:
     
 class PrimaryFunctionsImplementation:
 
-    def puts(output: String, program_state : ProgramState):
+    def puts(output: String, program_state : ProgramState) -> Null:
         program_state.logger_print(output.getValue())
         return ValueFactory.createNull()
     
-    def set(variable_name: VariableName, variable_value: Value, program_state : ProgramState):
+    def set(variable_name: VariableName, variable_value: Value, program_state : ProgramState) -> Null:
         program_state.addVar(variable_name, variable_value)
         return ValueFactory.createNull()
     
-    def concat(first: String, second: String, program_state : ProgramState):
+    def concat(first: String, second: String, program_state : ProgramState) -> String:
         return first.concat(second)
     
-    def lowercase(source: String, program_state : ProgramState):
+    def lowercase(source: String, program_state : ProgramState) -> String:
         return source.lowercase()
     
-    def uppercase(source: String, program_state : ProgramState):
+    def uppercase(source: String, program_state : ProgramState) -> String :
         return source.uppercase()
     
-    def replace(source: String, target: String, replacement: String, program_state : ProgramState):
+    def replace(source: String, target: String, replacement: String, program_state : ProgramState) -> String:
         return source.replace(target, replacement)
     
-    def substring(target_string: String, start: Int, end: Int, program_state : ProgramState):
+    def substring(target_string: String, start: Int, end: Int, program_state : ProgramState) -> String:
         if start.min(end) < ValueFactory.createInt(0) or start.max(end) >= target_string.size():
             raise Exception("Wrong substring range.")
         return target_string.substring(start, end)
     
-    def add(list: ListNumerical, program_state : ProgramState):
+    def add(list: ListNumerical, program_state : ProgramState) -> Numerical:
         return list.getSum()
     
-    def subtract(a: Numerical, b:Numerical, program_state : ProgramState):
+    def subtract(a: Numerical, b:Numerical, program_state : ProgramState) -> Numerical:
         return a - b
     
-    def multiply(list: ListNumerical, program_state : ProgramState):
+    def multiply(list: ListNumerical, program_state : ProgramState) -> Numerical:
         return list.getProduct()
     
-    def divide(a: Numerical, b:Numerical, program_state : ProgramState):
+    def divide(a: Numerical, b:Numerical, program_state : ProgramState) -> Numerical:
         if b == ValueFactory.createInt(0):
             raise Exception("Trying to divide by 0.")
         return a / b
     
-    def abs(a: Numerical, program_state : ProgramState):
+    def abs(a: Numerical, program_state : ProgramState) -> Numerical:
         return a.abs()
     
-    def max(list: ListNumerical, program_state : ProgramState):
+    def max(list: ListNumerical, program_state : ProgramState) -> Numerical:
         return list.max()
     
-    def min(list: ListNumerical, program_state : ProgramState):
+    def min(list: ListNumerical, program_state : ProgramState) -> Numerical:
         return list.min()
     
-    def lt(arg_1: Numerical, arg_2: Numerical, program_state : ProgramState):
+    def lt(arg_1: Numerical, arg_2: Numerical, program_state : ProgramState) -> Boolean:
         return arg_1 < arg_2
     
-    def gt(arg_1: Numerical, arg_2: Numerical, program_state : ProgramState):
+    def gt(arg_1: Numerical, arg_2: Numerical, program_state : ProgramState) -> Boolean:
         return arg_1 > arg_2
     
-    def equal(arg_1: Value, arg_2: Value, program_state : ProgramState):
+    def equal(arg_1: Value, arg_2: Value, program_state : ProgramState) -> Boolean:
         return arg_1 == arg_2
     
-    def not_equal(arg_1: Value, arg_2: Value, program_state : ProgramState):
+    def not_equal(arg_1: Value, arg_2: Value, program_state : ProgramState) -> Boolean:
         return arg_1 != arg_2
     
-    def str(arg, program_state : ProgramState):
-        #print("here")
+    def str(arg, program_state : ProgramState) -> String:
         return arg.str()
