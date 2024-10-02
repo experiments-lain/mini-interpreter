@@ -31,13 +31,19 @@ mini-interpreter
     └── generators                        -> Folder with automatic test generators
 ```
 
+## Architecture Diagram
+
+<p align="center">
+  <img src="assets/architecture/InterpreterArchitectureColoredWhiteBackground.svg" alt="Architecture Diagram" width="600">
+</p>
+
+
 ## TODO Tasks
 
 - [ ] Write technical blog post about implementation details and design decisions
 - [ ] Implement automatic test generation and evaluation scripts
 - [ ] Implement debug mode/debugger
 - [ ] Migrate code to C++ for improved performance
-
 
 ## Acknowledgement
 
