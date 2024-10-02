@@ -5,35 +5,29 @@ sys.path.append(os.getcwd())
 from interpreter.core.language_constructs.containers.containers import *
 from interpreter.core.language_constructs.data_types.data_types import *
 from interpreter.core.language_constructs.objects.object_types import *
-from interpreter.core.parser.parser import Parser
-from interpreter.core.symbol_table.symbol_table import VariableName
-from interpreter.standard_functions_library.standard_functions_library import FunctionsLibrary
+from interpreter.core.program_state.program_state_cl import ProgramState
 
 class Arguments:
 
     def __init__(self, arg_types):
         self.arg_types = arg_types
     
-    def validate(self, args, program):
-
+    def validate(self, args, program_state: ProgramState):
         if len(self.arg_types) == 1 and self.arg_types[0] == ListNumerical:
             arg_types = [Numerical for _ in range(len(args))]
         else:
             arg_types = self.arg_types
-
         if len(args) != len(arg_types):
-            program.raiseError()
+            raise Exception("The number of arguments is invalid.")
         for type, arg in zip(arg_types, args):
-            if isinstance(arg, VariableName):
-                if not issubclass(type, VariableName) and not isinstance(program.symbol_table.getVar(arg).getValue(), type):
-                    program.raiseError()
-                if (not issubclass(type, Variable)) and not isinstance(arg.getValue(), type):
-                    program.raiseError()
-            elif not isinstance(arg, type):
-                program.raiseError()
+            arg_val = arg
+            if not issubclass(type, VariableName) and isinstance(arg, VariableName):
+                arg_val = program_state.getVar(arg).getValue()
+            if not isinstance(arg_val, type):
+                raise Exception("Incorrect type of the argument.")
 
-    def cast(self, args, program):
-        self.validate(args, program)
+    def cast(self, args, program_state: ProgramState):
+        self.validate(args, program_state)
         if len(self.arg_types) == 1 and self.arg_types[0] == ListNumerical:
             arg_types = [Numerical for _ in range(len(args))]
         else:
@@ -41,42 +35,94 @@ class Arguments:
         casted_args = []
         for type, arg in zip(arg_types, args):
             if isinstance(arg, VariableName) and issubclass(type, Value):
-                casted_args.append(program.symbol_table.getVar(arg).getValue())
+                casted_args.append(program_state.getVar(arg).getValue())
             elif isinstance(arg, VariableName) and issubclass(type, Variable):            
-                casted_args.append(program.symbol_table.getVar(arg))
+                casted_args.append(program_state.getVar(arg))
             else:                
                 casted_args.append(arg)
         if len(self.arg_types) == 1 and self.arg_types[0] == ListNumerical:
             return ContainerFactory.createList(casted_args)
         return casted_args
 
+class BasicFunctionsImplementation:
+
+    def puts(output: String, program_state : ProgramState):
+        program_state.logger_print(output.getValue())
+        return ValueFactory.createNull()
+    
+    def set(variable_name: VariableName, variable_value: Value, program_state : ProgramState):
+        program_state.addVar(variable_name, variable_value)
+        return ValueFactory.createNull()
+    
+    def concat(first: String, second: String, program_state : ProgramState):
+        return first.concat(second)
+    
+    def lowercase(source: String, program_state : ProgramState):
+        return source.lowercase()
+    
+    def uppercase(source: String, program_state : ProgramState):
+        return source.uppercase()
+    
+    def replace(source: String, target: String, replacement: String, program_state : ProgramState):
+        return source.replace(target, replacement)
+    
+    def substring(target_string: String, start: Int, end: Int, program_state : ProgramState):
+        if start.min(end) < ValueFactory.createInt(0) or start.max(end) >= target_string.size():
+            raise Exception("Wrong substring range.")
+        return target_string.substring(start, end)
+    
+    def add(list: ListNumerical, program_state : ProgramState):
+        return list.getSum()
+    
+    def subtract(a: Numerical, b:Numerical, program_state : ProgramState):
+        return a - b
+    
+    def multiply(list: ListNumerical, program_state : ProgramState):
+        return list.getProduct()
+    
+    def divide(a: Numerical, b:Numerical, program_state : ProgramState):
+        if b == ValueFactory.createInt(0):
+            raise Exception("Trying to divide by 0.")
+        return a / b
+    
+    def abs(a: Numerical, program_state : ProgramState):
+        return a.abs()
+    
+    def max(list: ListNumerical, program_state : ProgramState):
+        return list.max()
+    
+    def min(list: ListNumerical, program_state : ProgramState):
+        return list.min()
+    
+    def lt(arg_1: Numerical, arg_2: Numerical, program_state : ProgramState):
+        return arg_1 < arg_2
+    
+    def gt(arg_1: Numerical, arg_2: Numerical, program_state : ProgramState):
+        return arg_1 > arg_2
+    
+    def equal(arg_1: Value, arg_2: Value, program_state : ProgramState):
+        return arg_1 == arg_2
+    
+    def not_equal(arg_1: Value, arg_2: Value, program_state : ProgramState):
+        return arg_1 != arg_2
+    
+    def str(arg, program_state : ProgramState):
+        return arg.str()
+
 
 class Function:
 
-
-    def __init__(self, instruction, arguments_format, src_program):
+    def __init__(self, instruction, args_validator):
         self.instruction = instruction
-        self.args_format = arguments_format
-        self.src_program = src_program
-        self.functions_library = FunctionsLibrary(self.src_program)
+        self.args_validator = args_validator
+        
     
-    def eval_arguments(self, ):
-        args = []
-        for arg in self.arguments:
-            parsed_arg = Parser.classify(arg, self.src_program)
-            if len(parsed_arg) > 1:
-                args.append(parsed_arg[0].execute(parsed_arg[1]))
-            else:
-                args.append(parsed_arg[0])
-        args = self.args_format.cast(args, self.src_program)
-        return args
+    def castArguments(self, args, program_state):
+        return self.args_validator.cast(args, program_state)
     
-    def execute(self, ):
-        # Step 1 convert all arguments to Constant Values
-        val_args = self.eval_arguments()
-        # Step 2 execute
-        self.functions_library.getattr(self.instruction)(*val_args)
-            
+    def execute(self, args, program_state : ProgramState):
+        return getattr(BasicFunctionsImplementation, self.instruction)(*self.castArguments(args, program_state), program_state = program_state)
+
 
 class FunctionFactory:
     allowed_instructions = ['puts', 'set', 'concat', 'lowercase', 
@@ -106,7 +152,7 @@ class FunctionFactory:
         'str' : Arguments([Value])
     }
         
-    def createFunction(function_name, program) -> Function:
+    def createFunction(function_name) -> Function:
         if not function_name in FunctionFactory.allowed_instructions:
-            program.raiseError()
-        return Function(function_name, FunctionFactory.instruction_args[function_name], program)
+            raise Exception("Incorrect funtion name.")
+        return Function(function_name, FunctionFactory.instruction_args[function_name])

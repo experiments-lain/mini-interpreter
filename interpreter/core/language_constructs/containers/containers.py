@@ -3,7 +3,7 @@ import sys
 
 sys.path.append(os.getcwd())
 
-from interpreter.core.language_constructs.objects.object_types import Constant
+from interpreter.core.language_constructs.objects.object_types import Value
 from interpreter.core.language_constructs.data_types.data_types import ValueFactory, Numerical
 
 from abc import ABC, abstractmethod
@@ -16,7 +16,7 @@ class Container(ABC):
         pass
 
 
-class ListNumerical(Container): # Maybe create an abstract list class that accepts data type (?)
+class ListNumerical(Container): # Create an abstract list class and extend it (?)
 
     def __init__(self, elements):
         for element in elements:
@@ -25,28 +25,30 @@ class ListNumerical(Container): # Maybe create an abstract list class that accep
         self.__list = elements
     
     def getSum(self,):
-        result = Constant(ValueFactory.createInt(0))
+        result = ValueFactory.createInt(0)
         for element in self.__list:
             result = result + element
         return result   
     
     def getProduct(self,):
-        result = Constant(ValueFactory.createInt(1))
+        result = ValueFactory.createInt(1)
         for element in self.__list:
             result = result * element
         return result   
     
     def max(self,):
-        result = Constant(ValueFactory.createInt(self.__list[0] - 1)) # Value that is less than maximum to reassign with correct datatype 
+        max_element_lower_bound = ValueFactory.createInt(self.__list[0] - 1)
+        max_element = max_element_lower_bound
         for element in self.list:
-            result = result.max(element)
-        return result
+            max_element = max_element.max(element)
+        return max_element
 
     def min(self,):
-        result = Constant(ValueFactory.createInt(self.__list[0] + 1)) # Value that is bigger than minimum to reassign with correct datatype 
+        min_element_upper_bound = ValueFactory.createInt(self.__list[0] + 1)
+        min_element = min_element_upper_bound
         for element in self.list:
-            result = result.min(element)
-        return result
+            min_element = min_element.min(element)
+        return min_element
  
     def debugPrint(self,):
         for element in self.list:

@@ -3,12 +3,12 @@ import sys
 
 sys.path.append(os.getcwd())
 
-from interpreter.core.language_constructs.containers.containers import *
-from interpreter.core.language_constructs.data_types.data_types import *
-from interpreter.core.language_constructs.functions.functions import *
-from interpreter.core.language_constructs.objects.object_types import *
-from interpreter.interpreter import Program
-from interpreter.core.symbol_table.symbol_table import VariableNameFactory
+from interpreter.core.language_constructs.containers.containers import ContainerFactory
+from interpreter.core.language_constructs.data_types.data_types import ValueFactory
+from interpreter.core.language_constructs.functions.functions import FunctionFactory
+from interpreter.core.language_constructs.functions.function_call import FunctionCallFactory
+from interpreter.core.language_constructs.objects.object_types import ObjectFactory, VariableNameFactory
+
 
 class Parser:
     # Static Parser
@@ -31,28 +31,45 @@ class Parser:
             result.append(current_str)
         return result
     
-    def parseFunctionCall(program, function_call: str):
+    def parseFunctionCall(function_call: str):
         if function_call[0] != '(':
-            raise RuntimeError("Internal error, incorrect command format!")
+            raise RuntimeError("Internal error: incorrect function format!")
         parsed_function_call =  Parser.separate(function_call[1:len(function_call)-1])
-        function, args = parsed_function_call[0], parsed_function_call[1:]
-        return function, args
-        
-    def parseExpression(expression: str, program):
-        if len(expression) == 0:
-            program.logger.raiseError()
-        elif expression[0] == '(':
-            instruction, args = Parser.parseCommand(program, expression)
-            return (FunctionFactory.createFunction(instruction), args)
-        elif expression[0] == '\"':
-            return ValueFactory.createString(expression[1:len(expression)-1])
+        function = FunctionFactory.createFunction(parsed_function_call[0])
+        arguments = [Parser.parseExpression(arg_expression) for arg_expression in parsed_function_call[1:]]
+        return FunctionCallFactory.createFunctionCall(function, arguments)
+
+    def classifyExpression(expression: str):
+        if expression[0] == '(':
+            return "Function call"
+        elif expression[0] == "\"":
+            return "String"
         elif expression == "true" or expression == "false":
-            return ValueFactory.createBoolean(expression == "true")
+            return "Boolean"
         elif expression == "null":
-            return ValueFactory.createNull()
-        elif ord('a') <= ord(expression[0]) and ord(expression[0]) <= ord('z'):
-            return VariableNameFactory.createVariabaleName(expression)
+            return "Null"
+        elif expression[0] in {chr(ord('a') + letter_order) for letter_order in range(0, 26)}:
+            return "Variable name"
         elif '.' in expression:
-            return ValueFactory.createFloat(float(expression))
+            return "Float"
         else:
-            return ValueFactory.createInt(int(expression))
+            return "Int"
+
+    def parseExpression(expression: str):
+        if len(expression) == 0:
+            raise RuntimeError("Interpretation error: Empty expression is given")
+        match Parser.classifyExpression(expression):                                  # Add validation (?)
+            case "Function call":
+                return Parser.parseFunctionCall(expression)
+            case "Variable name":
+                return VariableNameFactory.createVariableName(expression)
+            case "String":
+                return ValueFactory.createString(expression[1:-1])
+            case "Boolean":
+                return ValueFactory.createBoolean(expression)
+            case "Null":
+                return ValueFactory.createNull()
+            case "Float":
+                return ValueFactory.createFloat(float(expression))
+            case "Int":
+                return ValueFactory.createInt(int(expression))

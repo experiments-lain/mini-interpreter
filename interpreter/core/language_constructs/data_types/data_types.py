@@ -18,7 +18,8 @@ class Value(ABC):
  
 
 class Null(Value):
-
+    def __init__(self):
+        pass
     def str(self,):
         return ValueFactory.createString("null")
     
@@ -178,9 +179,8 @@ class Float(Numerical):
 
     def str(self):
         str_doub = ("{:.4f}".format(self.value))
-        for _ in range(3):
-            if str_doub[len(str_doub) - 1] == '0':
-                str_doub = str_doub[:len(str_doub) - 1]
+        while str_doub[-2] != '.' and str_doub[-1] == '0':
+            str_doub = str_doub[:-1]
         return ValueFactory.createString(str_doub)
 
 
