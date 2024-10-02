@@ -58,7 +58,7 @@ class String(Value): # Maybe add the String to container and change this class t
         return ValueFactory.createString(self.__value[start.getValue():end.getValue()])
     
     def str(self,):
-        return ValueFactory.createString(self)
+        return ValueFactory.createString(self.__value)
     
     def __eq__(self, other):
         if not isinstance(other, String):
@@ -96,7 +96,10 @@ class Numerical(Value):
     @abstractmethod   
     def __init__(self, value):
         pass
- 
+    
+    def getValue(self,):
+        return self.value
+    
     def __lt__(self, other):
         return ValueFactory.createBoolean(self.value < other.value)
  
@@ -116,9 +119,6 @@ class Int(Numerical):
 
     def __init__(self, value):
         self.value = int(value)
- 
-    def getValue(self,):
-        return self.value
 
     def __add__(self, other):
         if isinstance(other, Float):

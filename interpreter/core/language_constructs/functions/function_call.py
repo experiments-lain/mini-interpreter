@@ -3,8 +3,8 @@ import os
 
 sys.path.append(os.getcwd())
 
-from interpreter.core.language_constructs.functions.functions import Function 
-from interpreter.core.program_state.program_state_cl import ProgramState
+from interpreter.core.language_constructs.functions.function import Function 
+from interpreter.core.program_state.program_state_ import ProgramState
 
 class FunctionCall:
     
@@ -22,9 +22,7 @@ class FunctionCall:
         return evaled_args
     
     def execute(self, program_states: ProgramState):
-        # Step 1 convert all arguments to Constant Values
         val_args = self.evalArguments(self.args, program_states)
-        # Step 2 execute
         return self.function.execute(val_args, program_states)
 
 

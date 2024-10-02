@@ -12,6 +12,7 @@ class ProgramState:
         self.logger = Logger()
         self.symbol_table = SymbolTable()
         
+        
     def logger_print(self, output):
         self.logger.print(output)
 

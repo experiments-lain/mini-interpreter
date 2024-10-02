@@ -2,7 +2,7 @@ import os
 import sys
 sys.path.append(os.getcwd())
 
-from interpreter.core.program_state.program_state_cl import ProgramState
+from interpreter.core.program_state.program_state_ import ProgramState
 from interpreter.core.parser.parser import Parser
 from interpreter.core.language_constructs.functions.function_call import FunctionCall
 
@@ -35,3 +35,14 @@ class Program:
         for line in self.program_state.logger.output:
             print(line)
         quit()
+
+
+code = [
+    "(set v 3.50121)",
+    "(set a 2.0)",
+    "(puts (concat \"Score : \" (str (add v a))))",
+    "(puts (str (max a v 3.51)))"
+]
+program = Program(code)
+while True:
+    program.execCurrentLine()

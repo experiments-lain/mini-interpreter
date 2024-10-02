@@ -7,16 +7,14 @@ from interpreter.core.language_constructs.objects.object_types import ObjectFact
 
 
 
-
-
-
 class SymbolTable:
+
     def __init__(self):
         self.variables = {}
  
     def addVar(self, variable_name: VariableName, value: Value):
         # value is in value type class form 
-        if variable_name in self.variables:
+        if variable_name.getName() in self.variables:
             raise Exception("Trying to initialize existing variable")
         self.variables.update({variable_name.getName() : ObjectFactory.createVariable(variable_name, value)})
     

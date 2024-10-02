@@ -1,8 +1,4 @@
-# Mini-Interpreter
-
-A Lisp-like language interpreter implemented using Object-Oriented Programming paradigms, design patterns, and clean code principles. This mini-interpreter supports a set of expressions as described in the [Problem Description](docs/problem_description.md). 
-
-## Repository Structure
+# Repo Structure
 
 ```plaintext
 mini-interpreter
@@ -25,20 +21,8 @@ mini-interpreter
 ├── docs
 │   ├── problem_description.md            -> Description of the task          
 │   ├── structure.md                      -> This file
-│   └── blog_01.md                        -> The blog post with interpreter's architecture description  
+│   └── report_01.md                      -> The blog post with interpreter's architecture description  
 └── tests
     ├── generated_tests                   -> Folder with generated tests    
     └── generators                        -> Folder with automatic test generators
 ```
-
-## TODO Tasks
-
-- [ ] Write technical blog post about implementation details and design decisions
-- [ ] Implement automatic test generation and evaluation scripts
-- [ ] Implement debug mode/debugger
-- [ ] Migrate code to C++ for improved performance
-
-
-## Acknowledgement
-
-The problem itself is taken from UBS Coding Challenge.

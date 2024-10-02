@@ -5,19 +5,22 @@ sys.path.append(os.getcwd())
 from interpreter.core.language_constructs.containers.containers import *
 from interpreter.core.language_constructs.data_types.data_types import *
 from interpreter.core.language_constructs.objects.object_types import *
-from interpreter.core.program_state.program_state_cl import ProgramState
+from interpreter.core.program_state.program_state_ import ProgramState
 
 class Arguments:
 
     def __init__(self, arg_types):
+        self.arg_num = len(arg_types)
         self.arg_types = arg_types
     
     def validate(self, args, program_state: ProgramState):
         if len(self.arg_types) == 1 and self.arg_types[0] == ListNumerical:
             arg_types = [Numerical for _ in range(len(args))]
+            arg_num = len(arg_types)
         else:
             arg_types = self.arg_types
-        if len(args) != len(arg_types):
+            arg_num = self.arg_num
+        if len(args) != arg_num:
             raise Exception("The number of arguments is invalid.")
         for type, arg in zip(arg_types, args):
             arg_val = arg
@@ -41,10 +44,57 @@ class Arguments:
             else:                
                 casted_args.append(arg)
         if len(self.arg_types) == 1 and self.arg_types[0] == ListNumerical:
-            return ContainerFactory.createList(casted_args)
+            return [ContainerFactory.createList(casted_args)]
         return casted_args
 
-class BasicFunctionsImplementation:
+
+class Function:
+
+    def __init__(self, instruction, args_validator):
+        self.instruction = instruction
+        self.args_validator = args_validator
+    
+    def castArguments(self, args, program_state):
+        return self.args_validator.cast(args, program_state)
+    
+    def execute(self, args, program_state : ProgramState):
+        return getattr(PrimaryFunctionsImplementation, self.instruction)(*self.castArguments(args, program_state), program_state = program_state)
+
+
+class FunctionFactory:
+    allowed_instructions = ['puts', 'set', 'concat', 'lowercase', 
+        'uppercase', 'replace', 'substring', 'add', 'subtract', 
+        'multiply', 'divide', 'abs', 'max', 'min', 'lt', 'gt',
+        'equal', 'not_equal', 'str']
+    
+    instruction_args = {
+        'puts' : Arguments([String]),
+        'set' : Arguments([VariableName, Value]),
+        'concat' : Arguments([String, String]),
+        'lowercase' : Arguments([String]),
+        'uppercase' : Arguments([String]),
+        'replace' : Arguments([String, String, String]),
+        'substring' : Arguments([String, Int, Int]),
+        'add' : Arguments([ListNumerical]),
+        'subtract' : Arguments([Numerical, Numerical]),
+        'multiply' : Arguments([ListNumerical]),
+        'divide' : Arguments([Numerical, Numerical]),
+        'abs' : Arguments([Numerical]),
+        'max' : Arguments([ListNumerical]),
+        'min' : Arguments([ListNumerical]),
+        'lt' : Arguments([Numerical, Numerical]),
+        'gt' : Arguments([Numerical, Numerical]),
+        'equal' : Arguments([Value, Value]),
+        'not_equal' : Arguments([Value, Value]),
+        'str' : Arguments([Value])
+    }
+        
+    def createFunction(function_name) -> Function:
+        if not function_name in FunctionFactory.allowed_instructions:
+            raise Exception("Incorrect funtion name.")
+        return Function(function_name, FunctionFactory.instruction_args[function_name])
+    
+class PrimaryFunctionsImplementation:
 
     def puts(output: String, program_state : ProgramState):
         program_state.logger_print(output.getValue())
@@ -107,52 +157,5 @@ class BasicFunctionsImplementation:
         return arg_1 != arg_2
     
     def str(arg, program_state : ProgramState):
+        #print("here")
         return arg.str()
-
-
-class Function:
-
-    def __init__(self, instruction, args_validator):
-        self.instruction = instruction
-        self.args_validator = args_validator
-        
-    
-    def castArguments(self, args, program_state):
-        return self.args_validator.cast(args, program_state)
-    
-    def execute(self, args, program_state : ProgramState):
-        return getattr(BasicFunctionsImplementation, self.instruction)(*self.castArguments(args, program_state), program_state = program_state)
-
-
-class FunctionFactory:
-    allowed_instructions = ['puts', 'set', 'concat', 'lowercase', 
-        'uppercase', 'replace', 'substring', 'add', 'subtract', 
-        'multiply', 'divide', 'abs', 'max', 'min', 'lt', 'gt',
-        'equal', 'not_equal', 'str']
-    
-    instruction_args = {
-        'puts' : Arguments([String]),
-        'set' : Arguments([VariableName, Value]),
-        'concat' : Arguments([String, String]),
-        'lowercase' : Arguments([String]),
-        'uppercase' : Arguments([String]),
-        'replace' : Arguments([String, String, String]),
-        'substring' : Arguments([String, Int, Int]),
-        'add' : Arguments([ListNumerical]),
-        'subtract' : Arguments([Numerical, Numerical]),
-        'multiply' : Arguments([ListNumerical]),
-        'divide' : Arguments([Numerical, Numerical]),
-        'abs' : Arguments([Numerical]),
-        'max' : Arguments([ListNumerical]),
-        'min' : Arguments([ListNumerical]),
-        'lt' : Arguments([Numerical, Numerical]),
-        'gt' : Arguments([Numerical, Numerical]),
-        'equal' : Arguments([Value, Value]),
-        'not_equal' : Arguments([Value, Value]),
-        'str' : Arguments([Value])
-    }
-        
-    def createFunction(function_name) -> Function:
-        if not function_name in FunctionFactory.allowed_instructions:
-            raise Exception("Incorrect funtion name.")
-        return Function(function_name, FunctionFactory.instruction_args[function_name])

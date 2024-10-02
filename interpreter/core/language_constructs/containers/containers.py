@@ -37,21 +37,21 @@ class ListNumerical(Container): # Create an abstract list class and extend it (?
         return result   
     
     def max(self,):
-        max_element_lower_bound = ValueFactory.createInt(self.__list[0] - 1)
+        max_element_lower_bound = ValueFactory.createInt(self.__list[0].getValue() - 1)
         max_element = max_element_lower_bound
-        for element in self.list:
+        for element in self.__list:
             max_element = max_element.max(element)
         return max_element
 
     def min(self,):
-        min_element_upper_bound = ValueFactory.createInt(self.__list[0] + 1)
+        min_element_upper_bound = ValueFactory.createInt(self.__list[0].getValue() + 1)
         min_element = min_element_upper_bound
-        for element in self.list:
+        for element in self.__list:
             min_element = min_element.min(element)
         return min_element
  
     def debugPrint(self,):
-        for element in self.list:
+        for element in self.__list:
             print(element.getValue().value)
 
 
