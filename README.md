@@ -1,6 +1,6 @@
 # Mini-Interpreter
 
-A Lisp-like language interpreter implemented using Object-Oriented Programming paradigms, design patterns, and clean code principles. This mini-interpreter supports a set of expressions as described in the [Problem Description](docs/problem_description.md). 
+A Lisp-like language interpreter implemented from scratch using Object-Oriented Programming paradigms, design patterns, and clean code principles. This mini-interpreter supports a set of expressions as described in the [Problem Description](docs/problem_description.md). 
 
 ## Repository Structure
 
